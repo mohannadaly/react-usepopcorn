@@ -1,5 +1,5 @@
 import styles from "./style.module.css";
-function RatedMovie() {
+function RatedMovie({ movie }) {
   return <div></div>;
 }
 

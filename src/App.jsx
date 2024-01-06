@@ -79,8 +79,6 @@ function reducer(state, action) {
 
 export default function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [showMovieList, setShowMovieList] = useState(true);
-  const selectedMovie = state.movies.filter((movie) => movie.selected);
   useEffect(() => {
     () => dispatch({ type: "loadState" });
   }, [dispatch]);
@@ -126,8 +124,8 @@ export default function App() {
           )}
         </Box>
         <Box>
-          {selectedMovie.length === 1 ? (
-            <MovieDetails movie={selectedMovie[0]} dispatch={dispatch} />
+          {state.selectedMovie.length > 0 ? (
+            <MovieDetails movieId={state.selectedMovie} dispatch={dispatch} />
           ) : (
             <RatedMoviesList dispatch={dispatch} state={state} />
           )}
@@ -138,5 +136,18 @@ export default function App() {
 }
 
 function Box({ children }) {
-  return <div className="box">{children}</div>;
+  const [show, setShow] = useState(true);
+  return (
+    <div className="box">
+      <button
+        className="btn-toggle"
+        onClick={() => {
+          setShow((s) => !s);
+        }}
+      >
+        {show ? "-" : "+"}
+      </button>
+      {show && children}
+    </div>
+  );
 }
