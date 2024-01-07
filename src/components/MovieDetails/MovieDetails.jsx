@@ -3,6 +3,7 @@ import styles from "./style.module.css";
 import Loader from "../ui/Loader/Loader";
 import ErrorElement from "../ui/Error/ErrorElement";
 import useKey from "../../hooks/useKey";
+import StarRating from "./StarRating/StarRating";
 
 const API_KEY = "c27815d0";
 
@@ -86,7 +87,9 @@ function MovieDetails({ movieId, dispatch }) {
             </div>
           </header>
           <section>
-            <div className={styles.rating}></div>
+            <div className={styles.rating}>
+              <StarRating maxRating={10} size={24} />
+            </div>
             <p>{plot}</p>
             <p>{actors}</p>
             <p>{director}</p>
