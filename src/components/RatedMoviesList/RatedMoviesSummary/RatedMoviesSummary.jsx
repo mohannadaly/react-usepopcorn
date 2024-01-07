@@ -1,4 +1,8 @@
 import styles from "./style.module.css";
+import PropTypes from "prop-types";
+RatedMoviesSummary.propTypes = {
+  summary: PropTypes.object,
+};
 function RatedMoviesSummary({
   summary: { count = 0, avgImdbRating = 0, avgUserRating = 0, avgTime = 0 },
 }) {

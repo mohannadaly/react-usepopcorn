@@ -4,13 +4,27 @@ import Loader from "../ui/Loader/Loader";
 import ErrorElement from "../ui/Error/ErrorElement";
 import useKey from "../../hooks/useKey";
 import StarRating from "./StarRating/StarRating";
+import PropTypes from "prop-types";
 
 const API_KEY = "c27815d0";
 
-function MovieDetails({ movieId, dispatch }) {
+MovieDetails.propTypes = {
+  movieId: PropTypes.string,
+  dispatch: PropTypes.func,
+  ratedMovies: PropTypes.array,
+};
+
+function MovieDetails({ movieId, dispatch, ratedMovies }) {
   const [movie, setMovie] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [rating, setRating] = useState(0);
+
+  const matchingMovies = ratedMovies.filter(
+    (movie) => movie.imdbID === movieId
+  );
+  let movieAlreadyRated = false;
+  if (matchingMovies.length === 1) movieAlreadyRated = true;
 
   const {
     Title: title,
@@ -27,6 +41,16 @@ function MovieDetails({ movieId, dispatch }) {
 
   const handleBack = () => {
     dispatch({ type: "closeMovies" });
+  };
+
+  const handleRateMovie = (userRating) => {
+    setRating(userRating);
+  };
+
+  const handleAddMovie = () => {
+    dispatch({ type: "rateMovie", payload: { ...movie, userRating: rating } });
+    dispatch({ type: "closeMovies" });
+    dispatch({ type: "saveState" });
   };
 
   useEffect(() => {
@@ -54,7 +78,9 @@ function MovieDetails({ movieId, dispatch }) {
         setMovie(data);
         setError("");
       } catch (err) {
-        setError(err.message);
+        if (err.name !== "AbortError") {
+          setError(err.message);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -88,7 +114,22 @@ function MovieDetails({ movieId, dispatch }) {
           </header>
           <section>
             <div className={styles.rating}>
-              <StarRating maxRating={10} size={24} />
+              {!movieAlreadyRated ? (
+                <>
+                  <StarRating
+                    maxRating={10}
+                    size={24}
+                    onSetRating={handleRateMovie}
+                  />
+                  {rating > 0 && (
+                    <button className={styles.btnAdd} onClick={handleAddMovie}>
+                      + Add to list
+                    </button>
+                  )}
+                </>
+              ) : (
+                <p>{`You rated this movie ${matchingMovies[0].userRating} ⭐`}</p>
+              )}
             </div>
             <p>{plot}</p>
             <p>{actors}</p>

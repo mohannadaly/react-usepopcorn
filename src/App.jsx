@@ -1,9 +1,9 @@
 import "./index.css";
+import { useReducer, useEffect, useState } from "react";
 import NavBar from "./components/NavBar/NavBar";
 import Search from "./components/NavBar/Search/Search";
 import ErrorElement from "./components/ui/Error/ErrorElement";
 import Loader from "./components/ui/Loader/Loader";
-import { useReducer, useEffect, useState } from "react";
 import MoviesList from "./components/MoviesList/MoviesList";
 import MovieDetails from "./components/MovieDetails/MovieDetails";
 import RatedMoviesList from "./components/RatedMoviesList/RatedMoviesList";
@@ -60,6 +60,12 @@ function reducer(state, action) {
       };
       return newState;
     }
+    case "deleteMovie": {
+      const newRatedMovies = state.ratedMovies.filter(
+        (movie) => movie.imdbID !== action.payload
+      );
+      return { ...state, ratedMovies: newRatedMovies };
+    }
     case "loadState": {
       const storageItem = localStorage.getItem("ratedMovies");
       return JSON.parse(storageItem) || initialState;
@@ -80,8 +86,8 @@ function reducer(state, action) {
 export default function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
   useEffect(() => {
-    () => dispatch({ type: "loadState" });
-  }, [dispatch]);
+    dispatch({ type: "loadState" });
+  }, []);
   useEffect(() => {
     const controller = new AbortController();
     async function fetchData() {
@@ -125,7 +131,11 @@ export default function App() {
         </Box>
         <Box>
           {state.selectedMovie.length > 0 ? (
-            <MovieDetails movieId={state.selectedMovie} dispatch={dispatch} />
+            <MovieDetails
+              movieId={state.selectedMovie}
+              dispatch={dispatch}
+              ratedMovies={state.ratedMovies}
+            />
           ) : (
             <RatedMoviesList dispatch={dispatch} state={state} />
           )}
